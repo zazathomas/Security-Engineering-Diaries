@@ -1,0 +1,4 @@
+/* Justify text for all paragraph elements */
+p {
+    text-align: justify;
+}
