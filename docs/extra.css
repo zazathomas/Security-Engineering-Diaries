@@ -1,4 +1,5 @@
 /* Justify text for all paragraph elements */
 p {
     text-align: justify;
+    text-justify: inter-word;
 }

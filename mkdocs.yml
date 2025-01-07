@@ -5,19 +5,20 @@ theme:
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.sections
-    - toc.integrate
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.instant.preview
+    - navigation.tracking
+    - navigation.expand
+    - navigation.path
     - navigation.top
+    - toc.follow
     - search.suggest
     - search.highlight
     - search.share
     - content.tabs.link
     - content.code.annotation
     - content.code.copy
-    - navigation.instant
-    - navigation.instant.progress
-    - navigation.instant.preview
-    - navigation.tracking
-
   language: en
   palette:
     - scheme: default
@@ -33,11 +34,20 @@ theme:
       primary: teal
       accent: lime
 
+nav:
+  - Home: index.md
+  - About: about.md
+  - Blog:
+      - blog/index.md
+  - Tags: tags.md
+
 
 plugins:
   - social
   - search
-  - tags
+  - tags:
+      tags_file: tags.md
+  - blog
 
 extra_css:
   - extra.css
@@ -54,19 +64,11 @@ extra:
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - admonition
-  - pymdownx.arithmatex:
-      generic: true
-  - footnotes
-  - pymdownx.details
   - pymdownx.superfences
-  - pymdownx.mark
-  - attr_list
-  - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
 
 copyright: |
-  &copy; 2024 <a href="https://github.com/zazathomas"  target="_blank" rel="noopener">Zaza Thomas</a>
+  &copy; 2025 <a href="https://github.com/zazathomas"  target="_blank" rel="noopener">Zaza Thomas</a>
