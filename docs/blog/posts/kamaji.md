@@ -1,7 +1,7 @@
 ---
 date: 2025-03-11
 categories:
-    - Home lab
+    - Homelab
 tags:
     - Kubernetes
     - Proxmox
