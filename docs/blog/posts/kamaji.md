@@ -2,15 +2,19 @@
 date: 2025-03-11
 categories:
     - Homelab
+    - Cloud Security
 tags:
     - Kubernetes
     - Proxmox
+    - Kamaji
+authors:
+   - zaza
 ---
 
-# Building a Resilient Hybrid Kubernetes Cluster: Cloud Control Plane and On-Prem Workers
+# **Building a Resilient Hybrid Kubernetes Cluster: Cloud Control Planes and On-Prem Workers**
 
-In today’s dynamic infrastructure landscape, balancing scalability, cost-efficiency, and security is paramount. A hybrid Kubernetes cluster—combining a managed cloud control plane with on-premises worker nodes—offers the best of both worlds. This guide walks you through my journey of creating a fault-tolerant homelab Kubernetes cluster using **Kamaji** to host the control plane in Oracle Container Engine (OKE) and worker nodes on my Proxmox homelab.
-
+In today’s dynamic infrastructure landscape, balancing scalability, cost-efficiency, and security is paramount. A hybrid Kubernetes cluster—combining a managed cloud control plane with on-premises worker nodes—offers the best of both worlds. This guide walks you through my journey of creating a fault-tolerant homelab Kubernetes cluster using **Kamaji** to host the control plane in Oracle Container Engine (OKE) and worker nodes on my **Proxmox** homelab.
+<!-- more -->
 ---
 
 ## **Why Go Hybrid?**
@@ -114,10 +118,14 @@ With Kamaji operational, create a tenant control plane (TCP) to manage your work
    export TENANT_NAME=<specify control plane name>
    kubectl apply -f tcp-template.yaml -n ${TENANT_NAMESPACE}
    ```
-
-2. Retrieve the kubeconfig for your tenant cluster:
+3. Ensure the tenant control plane is operational:
    ```bash
-   kubectl get secret -n ${TENANT_NAMESPACE} ${TENANT_NAME}-admin-kubeconfig -o jsonpath='{.data.admin\.conf}' | base64 -d > homelab-tcp.kubeconfig
+   watch kubectl get tcp -n ${TENANT_NAMESPACE} ${TENANT_NAME}
+   ```
+
+3. Retrieve the kubeconfig for your tenant cluster:
+   ```bash
+   kubectl get secret -n ${TENANT_NAMESPACE} ${TENANT_NAME}-admin-kubeconfig -o jsonpath='{.data.admin\.conf}' | base64 -d > ${TENANT_NAME}-admin.kubeconfig
    ```
 
 ---
@@ -144,7 +152,7 @@ rm yaki.sh
 
 1. **Retrieve the Join Command**:
    ```bash
-   JOIN_CMD=$(kubeadm --kubeconfig=homelab-tcp.kubeconfig token create --print-join-command)
+   JOIN_CMD=$(kubeadm --kubeconfig=${TENANT_NAME}-admin.kubeconfig token create --print-join-command)
    ```
 
 2. **Execute the Command on Each Worker**:
@@ -185,13 +193,13 @@ After workers join, deploy these essentials:
 Verify cluster health:
 
 ```bash
-kubectl --kubeconfig=homelab-tcp.kubeconfig get nodes
+kubectl --kubeconfig=${TENANT_NAME}-admin.kubeconfig get nodes
 ```
 
 Ensure all nodes show `Ready` status, and deploy a test workload:
 
 ```bash
-kubectl --kubeconfig=homelab-tcp.kubeconfig run nginx --image=nginx --port=80
+kubectl --kubeconfig=${TENANT_NAME}-admin.kubeconfig run nginx --image=nginx --port=80
 ```
 
 ---
@@ -201,8 +209,11 @@ kubectl --kubeconfig=homelab-tcp.kubeconfig run nginx --image=nginx --port=80
 You’ve now built a hybrid Kubernetes cluster that merges the reliability of a managed cloud control plane with the flexibility of on-premises workers. This setup is ideal for homelabs or edge computing scenarios where data sovereignty and cost control are priorities.
 
 **Next Steps**:
+
 - Explore Kamaji’s multi-tenancy features for isolating workloads.
+  
 - Implement a CI/CD pipeline to deploy applications across hybrid nodes.
+  
 - Set up monitoring with Prometheus and Grafana.
 
 By embracing hybrid Kubernetes, you’re future-proofing your infrastructure—one cluster at a time. 🚀

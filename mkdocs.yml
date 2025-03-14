@@ -1,6 +1,12 @@
 site_name: Security Engineering Diaries
+site_description: My Journey to Cloud Native Mastery
+site_url: https://blog.z3cyber.tech
 theme:
   name: material
+  custom_dir: docs/blog/posts/overrides
+  font:
+    code: JetBrains Mono
+    text: JetBrains
   features:
     - navigation.tabs
     - navigation.tabs.sticky
@@ -19,35 +25,39 @@ theme:
     - content.tabs.link
     - content.code.annotation
     - content.code.copy
-  language: en
   palette:
-    - scheme: default
-      toggle:
-        icon: material/toggle-switch-off-outline
-        name: Switch to dark mode
-      primary: teal
-      accent: purple
-    - scheme: slate
-      toggle:
-        icon: material/toggle-switch
-        name: Switch to light mode
-      primary: teal
-      accent: lime
+      - media: "(prefers-color-scheme: light)"
+        scheme: default
+        primary: teal
+        accent: deep orange
+        toggle:
+          icon: material/brightness-7
+          name: Switch to dark mode
+      - media: "(prefers-color-scheme: dark)"
+        scheme: slate
+        primary: teal
+        accent: deep orange
+        toggle:
+          icon: material/brightness-4
+          name: Switch to light mode
 
 nav:
   - Home: index.md
-  - About: about.md
   - Blog:
       - blog/index.md
+  - About: about.md
   - Tags: tags.md
 
-
 plugins:
-  - social
   - search
+  - blog:
+      categories_allowed:
+        - Homelab
+        - Cloud Security
+        - Kubernetes
+      post_url_format: "{slug}"
   - tags:
       tags_file: tags.md
-  - blog
 
 extra_css:
   - extra.css

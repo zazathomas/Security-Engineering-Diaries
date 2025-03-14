@@ -1,16 +1,18 @@
 ---
-date: 2025-03-11
+date: 2025-03-08
 categories:
     - Homelab
 tags:
     - Kubernetes
-    - Proxmox
+    - Homelab
+authors:
+   - zaza
 ---
 
-**Title: Building My Homelab: A Security Engineer’s Journey into Cloud-Native Mastery**
+# **Why I Built a Homelab: A Security Engineer’s Journey into Cloud-Native Mastery**
 
-As a security engineer specializing in cloud-native environments, DevSecOps, and Kubernetes, my homelab isn’t just a hobby—it’s a mission-critical sandbox where theory meets practice, and vulnerabilities meet solutions. Over the years, this lab has evolved from a humble single board mini PC to a sprawling hybrid ecosystem spanning my home *and* Oracle Cloud. Here’s why I built it, what I’ve learned, and how it bridges my professional expertise with hands-on experimentation.
-
+As a security engineer specializing in cloud-native environments, DevSecOps, and Kubernetes, my homelab isn’t just a hobby—it’s a mission-critical sandbox where theory meets practice, and vulnerabilities meet solutions. Over the years, this lab has evolved from a humble single board mini PC to a sprawling hybrid ecosystem spanning my home *and* the public cloud. Here’s why I built it, what I’ve learned, and how it bridges my professional expertise with hands-on experimentation.
+<!-- more -->
 ---
 
 ### **The Catalyst: Why a Homelab?**
@@ -42,8 +44,8 @@ My homelab is a blend of on-premises hardware and cloud resources, optimized for
   - **Oracle Cloud Always-Free Tier**: A cloud-based kamaji control plane spanning 2 availability zones.
   - **Security Tools**:
     - **Kyverno** for policy-as-code (e.g., blocking privileged pods).
-    - **Falco** for runtime threat detection.
-    - **NeuVector** for zero-trust container security, enforcing network policies and continuouds monitoring for kuberneetes clusters.
+    - **Falco and Tetragon** for runtime threat detection.
+    - **NeuVector** for zero-trust container security, enforcing network policies and continuous monitoring for kuberneetes clusters.
     - **Cilium** for network policies and replacing legacy ingress with **Cilium Gateway API** (a game-changer for L7 routing).
 
 #### **3. Observability & Incident Response**
@@ -52,31 +54,56 @@ My homelab is a blend of on-premises hardware and cloud resources, optimized for
 - **n8n**: Repurposed as a lightweight SOAR (Security Orchestration, Automation, and Response) platform. It automates responses to common alerts—e.g., quarantining a compromised VM via Proxmox’s API or blocking an IP in AdGuard Home.
 
 #### **4. Identity & Access Management**
-- **Keycloak**: My centralized identity provider. It handles authentication for ArgoCD, Grafana, and even my media server stack. Integrating it with Kubernetes via OAuth2 Proxy taught me the nuances of securing SSO in distributed systems.
+- **Keycloak**: Centralized identity provider managing authentication flows for ArgoCD, Grafana, and media services. Integrated with Kubernetes through OIDC claim mapping, enforcing group-based RBAC policies across environments.
 
-#### **5. CI/CD & GitOps**
-- **ArgoCD**: The GitOps engine driving my deployments. Every change to my GitHub repo (infrastructure-as-code, app manifests) is automatically synced to the cluster. Rollbacks are as simple as reverting a commit.
-- **Apko**: Used to build secure, minimal container images for APIs. By distroless base images and static binaries, I’ve reduced CVE surface areas in custom apps.
+- **Teleport**: Identity-native infrastructure access platform providing:
+    - **Zero-Trust Kubernetes Access**: Short-lived X.509 certificates replacing static kubeconfig files, authenticated via Keycloak OIDC integration
+    - **Unified Audit Trail**: Session recording with ASN.1 BER-encoded audit logs for forensic-ready SSH/K8s access histories
+    - **Just-in-Time Permissions**: Time-bound role activation through Keycloak identity assertions (e.g., temporary cluster-admin during incidents)
 
-#### **6. Networking & Data Flow**
+- **SPIFFE/SPIRE**: Workload identity federation across hybrid clusters, enabling:
+    - Automated mTLS certificate issuance for service-to-service communication
+    - Fine-grained attestation policies based on kernel measurements
+
+#### **5. DevSecOps & GitOps Automation Framework**
+
+- **ArgoCD**: Core GitOps controller enforcing security-first deployment practices:  
+    - **Policy-as-Code Gates**: Integrated OPA/Gatekeeper checks validating resource constraints pre-sync  
+    - **Audit-Ready Versioning**: Immutable Git commit-triggered deployments with signed Kustomize manifests  
+    - **SSO-Enabled Governance**: Keycloak-integrated RBAC controlling environment promotions (dev → staging → prod)  
+
+- **Akto API Security**: Shift-left API protection framework implementing automated OpenAPI spec validation during CI builds  
+
+- **DefectDojo**: Unified vulnerability management platform providing:  
+    - **Aggregated Risk Scoring**: Correlation of SAST/DAST/SCA findings across microservices  
+    - **Compliance Mapping**: NIST 800-53 control alignment for critical vulnerabilities  
+    - **Automated Remediation**: GitLab MR generation with patched dependencies via Dependabot integration  
+
+
+#### **6. Data & Event Streaming**
+
+- **Kafka Event Mesh**: Mission-critical nervous system for security operations:  
+    - **Incident Forensics**: Immutable audit log retention for SOC2-compliant event replay  
+    - **Workflow Choreography**: Triggering automated responses via Knative Functions (e.g., quarantine workflows)  
+
+- **MinIO Object Storage**: S3-compatible backbone for:  
+    - **Artifact Registry**: Secure storage of static files and SBOM archives  
+    - **Immutable Backups**: Write-Once-Read-Many (WORM) policies for Velero cluster snapshots with cross instance replication.
+
+- **Kopia Enterprise-Grade DR**: Cross-platform recovery solution featuring:  
+    - **Hybrid Cloud Backups**: Unified policy management for local/Oracle Cloud storage targets  
+    - **Military-Grade Encryption**: AES-256-GCM protected backups with Keycloak-managed keys  
+    - **Ransomware Resilience**: Air-gapped backups via automated MinIO bucket isolation triggers  
+
+#### **7. Networking & Data Flow**
 - **AdGuard Home**: Blocks ads/malware at the DNS layer, with custom rules to silence chatty IoT devices. Integrated with Prometheus to log query trends.
 - **Traefik & Cilium Gateway API**: Traefik handles TLS termination for public-facing apps, while Cilium Gateway API manages internal L7 routing (e.g., gRPC traffic between microservices).
 - **Kafka**: Acts as the message broker for event-driven workflows. For example, IoT sensor data streams into Kafka, processed by Flink for anomaly detection, and stored in TimescaleDB.
 
-#### **7. Home Automation & Media**
+#### **8. Home Automation & Media**
 - **Home Assistant**: Runs in a Kubernetes pod, with Zigbee2MQTT and Node-RED automating lights, HVAC, and security cameras.
 - **Media Server Stack**: Jellyfin for streaming, backed by RAID-Z2 storage in Proxmox. Secured with Keycloak authentication and NeuVector network policies to isolate it from other services.
 
----
-
-### **The Hybrid Cloud: Spanning Home and Oracle Cloud**
-
-To mirror enterprise environments, I extended my lab to Oracle Cloud’s Always-Free tier:
-- **Control Plane Resilience**: Hosting Kubernetes control plane components in the cloud ensures availability even if my home loses power.
-- **Cost Efficiency**: Free ARM compute instances handle resource-heavy tasks (e.g., CI/CD runners for Tekton pipelines).
-- **Geo-Redundancy**: Critical services like VPN (WireGuard) and backup storage (MinIO) replicate across regions.
-
-**Example Project**: A cloud-hosted Vault instance manages secrets for both environments, while SPIFFE/SPIRE enforces workload identity across clusters.
 
 ---
 
@@ -91,13 +118,13 @@ To mirror enterprise environments, I extended my lab to Oracle Cloud’s Always-
    - Solution: Regular `gVisor` sandboxing trials and seccomp profiles tailored to each workload.
 
 3. **Power Outages Are the Ultimate Test**:
-   - After a 12-hour blackout corrupted my local Ceph storage, I adopted a 3-2-1 backup rule:
+   - After a 12-hour blackout corrupted my local storage, I adopted a 3-2-1 backup rule:
      - **3 copies** of data (local, Oracle Cloud, and Cloudflare R2).
      - **2 formats** (raw disks and containerized volumes).
      - **1 air-gapped backup** (an offline SSD updated monthly).
 
 4. **Documentation Is Survival**:
-   - My early "I’ll remember how this works" phase led to days of reverse-engineering my own setups. Now, everything is codified in IaC (Terraform + Ansible) and Obsidian.
+   - My early "I’ll remember how this works" phase led to days of reverse-engineering my own setups. Now, everything is codified in IaC (Terraform + Ansible) and well documented on Obsidian.
 
 ---
 
@@ -118,17 +145,4 @@ For security engineers, a homelab isn’t about the tech—it’s about cultivat
 
 If you’re in tech, build a lab. Let it break. Learn from it. Because the next zero-day or misconfigured S3 bucket you thwart might just owe its defeat to the lessons learned in your basement at 2 a.m.
 
----
-
-**Tools & Projects Mentioned**:
-- **Virtualization**: Proxmox, KVM
-- **Containers**: Docker, containerd, gVisor, Apko
-- **Kubernetes**: K3s, Cilium, Kyverno, Falco, Tetragon, NeuVector, ArgoCD
-- **Networking**: AdGuard Home, Traefik, Cilium Gateway API, Kafka
-- **Monitoring**: Prometheus, Grafana, Wazuh
-- **Security**: Vault, SPIFFE/SPIRE, Trivy, Keycloak
-- **Automation**: n8n, Home Assistant, Node-RED
-- **Media**: Jellyfin, Zigbee2MQTT
-
-*Diagram*: [Imagine a hand-drawn sketch here of my hybrid setup—Proxmox VMs, Kubernetes clusters, and Oracle Cloud nodes all connected via Traefik, with AdGuard Home as the DNS watchdog.]
 
