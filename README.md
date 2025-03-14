@@ -1,4 +1,3 @@
-```markdown
 # Security Engineering Diaries
 
 Technical blog documenting cloud-native security patterns, DevSecOps implementations, and enterprise infrastructure strategies - adapted for homelab environments.
@@ -41,4 +40,3 @@ Content licensed under [CC BY-SA 4.0](LICENSE). Code snippets under [MIT License
 📬 **Contact**: [LinkedIn](https://www.linkedin.com/in/zazathomas/)
 
 *Disclaimer: Content represents lab implementations - validate all patterns in staging before production use.*
-```
