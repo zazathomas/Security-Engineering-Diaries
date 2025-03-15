@@ -172,7 +172,7 @@ After workers join, deploy these essentials:
 1. **CNI Plugin** (e.g., Cilium):
    ```bash
    helm repo add cilium https://helm.cilium.io/
-   helm install cilium cilium/cilium --version 1.17.1 --namespace kube-system
+   helm install cilium cilium/cilium --version 1.17.1 --namespace kube-system --set k8sServiceHost=<kube-api-server>
    ```
 
 2. **Storage Provider** (e.g. Longhorn):
