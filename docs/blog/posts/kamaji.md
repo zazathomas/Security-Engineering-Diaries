@@ -56,9 +56,10 @@ helm install cert-manager jetstack/cert-manager \
 
 ### **Install Kamaji**
 
-1. Add the Clastix Helm repository:
+1. Add & Update the Clastix Helm repository:
    ```bash
    helm repo add clastix https://clastix.github.io/charts
+   helm repo update
    ```
 
 2. Clone the Kamaji repository and deploy:
@@ -101,7 +102,7 @@ Apply the secret and deploy the console:
 
 ```bash
 kubectl apply -f console-secret.yaml
-helm -n kamaji-system install console clastix/kamaji-console -f console-values.yaml
+helm -n kamaji-system install console clastix/kamaji-console --set replicaCount=1
 ```
 
 Access the console via port-forwarding or an ingress controller using the credentials from the secret.
