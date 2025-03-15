@@ -152,7 +152,7 @@ rm yaki.sh
 
 1. **Retrieve the Join Command**:
    ```bash
-   JOIN_CMD=$(kubeadm --kubeconfig=${TENANT_NAME}-admin.kubeconfig token create --print-join-command)
+   JOIN_CMD=$(sudo kubeadm --kubeconfig=${TENANT_NAME}-admin.kubeconfig token create --print-join-command)
    ```
 
 2. **Execute the Command on Each Worker**:
